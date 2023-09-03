@@ -1,0 +1,170 @@
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://cdn.skypack.dev/@arco-design/web-react@2.52.2/dist/css/arco.css" rel="stylesheet" crossorigin="anonymous" />
+<title>e高速</title>
+<style>
+#root {
+  padding: 20px;
+}
+</style>
+</head>
+<body>
+<div id="root">Loading...</div>
+<script type="module">
+import htm from 'https://cdn.skypack.dev/htm'
+import { createElement, useEffect, useState } from 'https://cdn.skypack.dev/react@18'
+import { render } from 'https://cdn.skypack.dev/react-dom@18'
+import { Card, Select, Space, Table } from 'https://cdn.skypack.dev/@arco-design/web-react@2.52.2'
+import Big from 'https://cdn.skypack.dev/big.js'
+
+const html = htm.bind(createElement)
+
+function App() {
+  const [ card, setCard ] = useState(null)
+  const [ cards, setCards ] = useState([])
+  const [ bills, setBills ] = useState([])
+  const [ months, setMonths ] = useState([])
+  const [ summary, setSummary ] = useState({})
+
+  useEffect(() => {
+    window.__yigaosuCards = cards => {
+      cards = cards.filter(Boolean)
+      setCards(cards)
+      setCard(cards.length > 0 ? cards[0].CardNo : null)
+    }
+    loadScript('cards.js')
+  }, [])
+
+  useEffect(() => {
+    if (!card) return
+    window.__yigaosuBills = bills => {
+      bills = bills.filter(Boolean)
+      const sum = {}
+      const count = {}
+      let totalSum = new Big(0)
+      let totalCount = 0
+      bills.forEach((bill, i) => {
+        const date = new Date(bill.EndAt)
+        const s = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        sum[s] = sum[s] || new Big(0)
+        sum[s] = sum[s].plus(new Big(bill.Amount))
+        count[s] = count[s] || 0
+        count[s] = count[s] + 1
+        bills[i].Number = i + 1
+        totalSum = totalSum.plus(new Big(bill.Amount))
+        totalCount += 1
+      })
+      setBills(bills)
+      const months = Object.keys(sum).map(month => ({
+        month,
+        count: count[month],
+        sum: sum[month].toString(),
+      }))
+      setMonths(months)
+      setSummary({
+        count: totalCount,
+        sum: totalSum.toString(),
+      })
+    }
+    loadScript(`${card}.js`)
+  }, [ card ])
+
+  const monthColumns = [
+    {
+      title: '月份',
+      dataIndex: 'month',
+    },
+    {
+      title: '次数',
+      dataIndex: 'count',
+      sorter: (a, b) => a.count - b.count,
+    },
+    {
+      title: '合计',
+      dataIndex: 'sum',
+      sorter: (a, b) => a.sum - b.sum,
+    },
+  ]
+
+  const billColumns = [
+    {
+      title: '#',
+      dataIndex: 'Number',
+    },
+    {
+      title: '驶入时间',
+      dataIndex: 'BeginAt',
+      render: BeginAt => formatTime(BeginAt),
+    },
+    {
+      title: '驶出时间',
+      dataIndex: 'EndAt',
+      render: EndAt => formatTime(EndAt),
+    },
+    {
+      title: '驶入收费站',
+      dataIndex: 'From',
+      render: From => fix(From),
+    },
+    {
+      title: '驶出收费站',
+      dataIndex: 'To',
+      render: To => fix(To),
+    },
+    {
+      title: '金额',
+      dataIndex: 'Amount',
+      sorter: (a, b) => a.Amount - b.Amount,
+    },
+  ]
+
+  return html`<${Card}>
+  <${Space} direction="vertical" size=${15}>
+    <${Select} value=${card} onChange=${setCard}>
+      ${cards.map(card => (
+        html`<${Select.Option} key=${card.CardNo} value=${card.CardNo}>${card.CardNo}<//>`
+      ))}
+    <//>
+    <${Table} columns=${monthColumns} data=${months} pagination=${false} summary=${data => (
+        html`<${Table.Summary.Row}>
+          <${Table.Summary.Cell}>合计<//>
+          <${Table.Summary.Cell}>${summary.count}<//>
+          <${Table.Summary.Cell}>${summary.sum}<//>
+        <//>`
+      )} />
+    <${Table} columns=${billColumns} data=${bills} pagePosition="bottomCenter"
+      pagination=${{ pageSize: 50 }} />
+  <//>
+<//>`
+}
+
+render(html`<${App} />`, document.getElementById('root'))
+
+function loadScript (src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = src
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+}
+
+function formatTime (d) {
+  const date = new Date(d)
+  return date.getFullYear() + '-' +
+    String(date.getMonth() + 1).padStart(2, '0') + '-' +
+    String(date.getDate()).padStart(2, '0') + ' ' +
+    String(date.getHours()).padStart(2, '0') + ':' +
+    String(date.getMinutes()).padStart(2, '0') + ':' +
+    String(date.getSeconds()).padStart(2, '0')
+}
+
+function fix (str) {
+  return str.replace(/(\S*)省\1/, '$1')
+}
+</script>
+</body>
+</html>
