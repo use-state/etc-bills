@@ -55,6 +55,11 @@ function App() {
         bills[i].Number = i + 1
         totalSum = totalSum.plus(new Big(bill.Amount))
         totalCount += 1
+        if (bill.BeginAt === '1970-01-01T00:00:00Z') {
+          bills[i].Time = 0
+        } else {
+          bills[i].Time = (new Date(bill.EndAt) - new Date(bill.BeginAt)) / 1000
+        }
       })
       setBills(bills)
       const months = Object.keys(sum).map(month => ({
@@ -102,6 +107,12 @@ function App() {
       title: '驶出时间',
       dataIndex: 'EndAt',
       render: EndAt => formatTime(EndAt),
+    },
+    {
+      title: '时间',
+      dataIndex: 'Time',
+      sorter: (a, b) => a.Time - b.Time,
+      render: Time => `${Time}秒`,
     },
     {
       title: '驶入收费站',
@@ -153,6 +164,7 @@ function loadScript (src) {
 }
 
 function formatTime (d) {
+  if (d === '1970-01-01T00:00:00Z') return '-'
   const date = new Date(d)
   return date.getFullYear() + '-' +
     String(date.getMonth() + 1).padStart(2, '0') + '-' +
