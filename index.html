@@ -8,6 +8,18 @@
 #root {
   padding: 20px;
 }
+
+.desc {
+  font-size: 10px;
+}
+
+.success {
+  color: green;
+}
+
+.danger {
+  color: red;
+}
 </style>
 </head>
 <body>
@@ -16,7 +28,7 @@
 import htm from 'https://cdn.skypack.dev/htm'
 import { createElement, useEffect, useState } from 'https://cdn.skypack.dev/react@18'
 import { render } from 'https://cdn.skypack.dev/react-dom@18'
-import { Card, Select, Space, Table } from 'https://cdn.skypack.dev/@arco-design/web-react@2.52.2'
+import { Card, Select, Space, Table, Tabs } from 'https://cdn.skypack.dev/@arco-design/web-react@2.52.2'
 import Big from 'https://cdn.skypack.dev/big.js'
 
 const html = htm.bind(createElement)
@@ -27,7 +39,9 @@ function App() {
   const [ bills, setBills ] = useState([])
   const [ months, setMonths ] = useState([])
   const [ summary, setSummary ] = useState({})
+  const [ routes, setRoutes ] = useState({})
   const [ loading, setLoading ] = useState(null)
+  const [ currentTab, setCurrentTab ] = useLocalStorage('currentTab', 'summary')
 
   useEffect(() => {
     window.__yigaosuCards = cards => {
@@ -49,6 +63,7 @@ function App() {
       const count = {}
       let totalSum = new Big(0)
       let totalCount = 0
+      const routes = {}
       bills.forEach((bill, i) => {
         const date = new Date(bill.EndAt)
         const s = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -64,6 +79,23 @@ function App() {
         } else {
           bills[i].Time = (new Date(bill.EndAt) - new Date(bill.BeginAt)) / 1000
         }
+        bills[i].From = fix(bills[i].From)
+        bills[i].To = fix(bills[i].To)
+        const routeKey = `${bills[i].From}-${bills[i].To}`
+        if (!routes[routeKey]) routes[routeKey] = { bills: [], minTime: 0, maxTime: 0 }
+        routes[routeKey].bills.push(bills[i])
+        bills[i].RouteKey = routeKey
+      })
+      for (const key in routes) {
+        routes[key].minTime = routes[key].bills.reduce((min, b) => b.Time < min ? b.Time : min, routes[key].bills[0].Time)
+        routes[key].maxTime = routes[key].bills.reduce((max, b) => b.Time > max ? b.Time : max, routes[key].bills[0].Time)
+        routes[key].bills.sort((a, b) => a.Time - b.Time)
+      }
+      setRoutes(routes)
+      bills.forEach((bill, i) => {
+        const minTime = routes[bill.RouteKey].minTime
+        bills[i].TimeDiff = (minTime - bill.Time) / minTime
+        bills[i].RouteMinTime = minTime
       })
       setBills(bills)
       const months = Object.keys(sum).map(month => ({
@@ -114,44 +146,65 @@ function App() {
       render: EndAt => formatTime(EndAt),
     },
     {
+      title: '驶入收费站',
+      dataIndex: 'From',
+    },
+    {
+      title: '驶出收费站',
+      dataIndex: 'To',
+    },
+    {
       title: '时间',
       dataIndex: 'Time',
       sorter: (a, b) => a.Time - b.Time,
       render: Time => `${Time}秒`,
     },
     {
-      title: '驶入收费站',
-      dataIndex: 'From',
-      render: From => fix(From),
+      title: '最快',
+      dataIndex: 'RouteMinTime',
+      render: Time => `${Time}秒`,
     },
     {
-      title: '驶出收费站',
-      dataIndex: 'To',
-      render: To => fix(To),
+      title: '较最快',
+      dataIndex: 'TimeDiff',
+      sorter: (a, b) => a.TimeDiff - b.TimeDiff,
+      render: TimeDiff => html`<div>${`${(TimeDiff * 100).toFixed(2)}%`}</div>`
     },
     {
       title: '金额',
       dataIndex: 'Amount',
-      sorter: (a, b) => a.Amount - b.Amount,
+      sorter: (a, b) => {
+        const diff = a.Amount - b.Amount
+        if (diff === 0) {
+          return a.Time - b.Time
+        }
+        return diff
+      }
     },
   ]
 
   return html`<${Card}>
-  <${Space} direction="vertical" size=${15}>
+  <${Space} direction="vertical" size=${15} style=${{ width: '100%' }}>
     <${Select} value=${card} onChange=${setCard} loading=${loading === 'cards'}>
       ${cards.map(card => (
         html`<${Select.Option} key=${card.CardNo} value=${card.CardNo}>${card.CardNo}<//>`
       ))}
     <//>
-    <${Table} loading=${loading === 'bills'} columns=${monthColumns} data=${months} pagination=${false} summary=${data => (
-        html`<${Table.Summary.Row}>
-          <${Table.Summary.Cell}>合计<//>
-          <${Table.Summary.Cell}>${summary.count}<//>
-          <${Table.Summary.Cell}>${summary.sum}<//>
-        <//>`
-      )} />
-    <${Table} loading=${loading === 'bills'} columns=${billColumns} data=${bills} pagePosition="bottomCenter"
-      pagination=${{ pageSize: 50 }} />
+    <${Tabs} style=${{ width: '100%' }} activeTab=${currentTab} onChange=${setCurrentTab}>
+      <${Tabs.TabPane} key="summary" title="汇总">
+        <${Table} loading=${loading === 'bills'} size="small" columns=${monthColumns} data=${months} pagination=${false} summary=${data => (
+            html`<${Table.Summary.Row}>
+              <${Table.Summary.Cell}>合计<//>
+              <${Table.Summary.Cell}>${summary.count}<//>
+              <${Table.Summary.Cell}>${summary.sum}<//>
+            <//>`
+          )} />
+      <//>
+      <${Tabs.TabPane} key="bills" title="详细">
+        <${Table} loading=${loading === 'bills'} size="small" columns=${billColumns} data=${bills} pagePosition="bottomCenter"
+          pagination=${{ pageSize: 50 }} />
+      <//>
+    <//>
   <//>
 <//>`
 }
@@ -181,6 +234,30 @@ function formatTime (d) {
 
 function fix (str) {
   return str.replace(/(\S*)省\1/, '$1')
+}
+
+function useLocalStorage (key, initialValue) {
+  const [ storedValue, setStoredValue ] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key)
+      return item ? JSON.parse(item) : initialValue
+    } catch (error) {
+      console.log(error)
+      return initialValue
+    }
+  })
+
+  const setValue = (value) => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value
+      setStoredValue(valueToStore)
+      window.localStorage.setItem(key, JSON.stringify(valueToStore))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  return [ storedValue, setValue ]
 }
 </script>
 </body>
