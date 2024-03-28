@@ -2,9 +2,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://cdn.skypack.dev/@arco-design/web-react@2.52.2/dist/css/arco.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/dist/css/arco.css" rel="stylesheet" crossorigin="anonymous" />
 <title>e高速</title>
 <style>
+html, body {
+  min-height: 100%;
+}
+
+a {
+  color: rgb(var(--link-6));
+}
+
 #root {
   padding: 20px;
 }
@@ -25,23 +33,42 @@
 <body>
 <div id="root">Loading...</div>
 <script type="module">
-import htm from 'https://cdn.skypack.dev/htm'
-import { createElement, useEffect, useState } from 'https://cdn.skypack.dev/react@18'
-import { render } from 'https://cdn.skypack.dev/react-dom@18'
-import { Card, Select, Space, Table, Tabs } from 'https://cdn.skypack.dev/@arco-design/web-react@2.52.2'
-import Big from 'https://cdn.skypack.dev/big.js'
+import htm from 'https://cdn.jsdelivr.net/npm/htm/+esm'
+import { createElement, useEffect, useMemo, useState } from 'https://cdn.jsdelivr.net/npm/react@18.2.0/+esm'
+import { render } from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm'
+import { Card, Checkbox, DatePicker, Select, Space, Table, Tabs } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/+esm'
+import Big from 'https://cdn.jsdelivr.net/npm/big.js/+esm'
+import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs/+esm'
+import isSameOrAfter from 'https://cdn.jsdelivr.net/npm/dayjs/plugin/isSameOrAfter.js/+esm'
+import isSameOrBefore from 'https://cdn.jsdelivr.net/npm/dayjs/plugin/isSameOrBefore.js/+esm'
+
+dayjs.extend(isSameOrAfter)
+dayjs.extend(isSameOrBefore)
 
 const html = htm.bind(createElement)
+
+const SHORTCUTS = [
+  { text: '昨天', value: () => [ dayjs().subtract(1, 'day').startOf('day'), dayjs().subtract(1, 'day').endOf('day') ] },
+  { text: '今天', value: () => [ dayjs().startOf('day'), dayjs().endOf('day') ] },
+  { text: '上周', value: () => [ dayjs().subtract(1, 'week').startOf('isoWeek'), dayjs().subtract(1, 'week').endOf('isoWeek') ] },
+  { text: '本周', value: () => [ dayjs().startOf('isoWeek'), dayjs().endOf('isoWeek') ] },
+  { text: '上月', value: () => [ dayjs().subtract(1, 'month').startOf('month'), dayjs().subtract(1, 'month').endOf('month') ] },
+  { text: '本月', value: () => [ dayjs().startOf('month'), dayjs().endOf('month') ] },
+]
 
 function App() {
   const [ card, setCard ] = useState(null)
   const [ cards, setCards ] = useState([])
+  const [ regions, setRegions ] = useState([])
   const [ bills, setBills ] = useState([])
   const [ months, setMonths ] = useState([])
   const [ summary, setSummary ] = useState({})
   const [ routes, setRoutes ] = useState({})
   const [ loading, setLoading ] = useState(null)
   const [ currentTab, setCurrentTab ] = useLocalStorage('currentTab', 'summary')
+  const [ range, setRange ] = useLocalStorage('currentRange', [])
+  const [ region, setRegion ] = useLocalStorage('currentRegion', undefined)
+  const [ hideOne, setHideOne ] = useLocalStorage('hideOne', true)
 
   useEffect(() => {
     window.__yigaosuCards = cards => {
@@ -108,15 +135,33 @@ function App() {
         count: totalCount,
         sum: totalSum.toString(),
       })
+
+      setLoading('regions')
+      window.__yigaosuRegions = regions => {
+        setLoading(null)
+        regions = regions.filter(Boolean).map(region => ({ value: region, count: routes[region].bills.length }))
+        regions.sort((a, b) => b.count - a.count)
+        setRegions(regions)
+      }
+      loadScript('regions.js')
     }
     setLoading('bills')
     loadScript(`${card}.js`)
   }, [ card ])
 
-  const monthColumns = [
+  const monthColumns = useMemo(() => [
     {
       title: '月份',
       dataIndex: 'month',
+      render: value => html`<a href="" onClick=${e => {
+        e.preventDefault()
+        setCurrentTab('bills')
+        const year = parseInt(value.split('-')[0])
+        const month = parseInt(value.split('-')[1]) - 1
+        const firstDayOfMonth = dayjs(new Date(year, month, 1, 0, 0, 0))
+        const lastDayOfMonth = dayjs(new Date(year, month + 1, 0, 23, 59, 59))
+        setRange([ firstDayOfMonth, lastDayOfMonth ])
+      }}>${value}</a>`,
     },
     {
       title: '次数',
@@ -128,9 +173,28 @@ function App() {
       dataIndex: 'sum',
       sorter: (a, b) => a.sum - b.sum,
     },
-  ]
+  ], [])
 
-  const billColumns = [
+  const regionColumns = useMemo(() => [
+    {
+      title: '路线',
+      dataIndex: 'value',
+      render: value => html`<a href="" onClick=${e => {
+        e.preventDefault()
+        setCurrentTab('bills')
+        setRegion(value)
+      }}>${value}</a>`,
+    },
+    {
+      title: '数量',
+      dataIndex: 'count',
+      sorter: (a, b) => a.count - b.count,
+      render: count => count,
+      defaultSortOrder: 'descend',
+    },
+  ] , [])
+
+  const billColumns = useMemo(() => [
     {
       title: '#',
       dataIndex: 'Number',
@@ -181,7 +245,18 @@ function App() {
         return diff
       }
     },
-  ]
+  ], [])
+
+  const filteredBills = useMemo(() => (bills
+    .filter(b => range && range.length === 2 ? (
+      dayjs(b.BeginAt).isSameOrAfter(range[0]) && dayjs(b.EndAt).isSameOrBefore(range[1])
+    ): true)
+    .filter(b => region ? (
+      b.RouteKey === region
+    ): true)
+  ), [ bills, range, region ])
+
+  const filteredRegions = useMemo(() => regions.filter(r => hideOne ? r.count > 1 : true), [ regions, hideOne ])
 
   return html`<${Card}>
   <${Space} direction="vertical" size=${15} style=${{ width: '100%' }}>
@@ -192,17 +267,33 @@ function App() {
     <//>
     <${Tabs} style=${{ width: '100%' }} activeTab=${currentTab} onChange=${setCurrentTab}>
       <${Tabs.TabPane} key="summary" title="汇总">
-        <${Table} loading=${loading === 'bills'} size="small" columns=${monthColumns} data=${months} pagination=${false} summary=${data => (
-            html`<${Table.Summary.Row}>
-              <${Table.Summary.Cell}>合计<//>
-              <${Table.Summary.Cell}>${summary.count}<//>
-              <${Table.Summary.Cell}>${summary.sum}<//>
-            <//>`
-          )} />
+        <${Space} align="start">
+          <${Table} loading=${loading === 'bills'} size="small" columns=${monthColumns} data=${months} pagination=${false} summary=${data => (
+              html`<${Table.Summary.Row}>
+                <${Table.Summary.Cell}>合计<//>
+                <${Table.Summary.Cell}>${summary.count}<//>
+                <${Table.Summary.Cell}>${summary.sum}<//>
+              <//>`
+            )} />
+          <${Table} size="small" columns=${regionColumns} data=${filteredRegions} pagination=${false}
+          footer=${() => html`<${Checkbox} checked=${hideOne} onChange=${setHideOne}>不显示数量为1的路线<//>`} />
+        <//>
       <//>
       <${Tabs.TabPane} key="bills" title="详细">
-        <${Table} loading=${loading === 'bills'} size="small" columns=${billColumns} data=${bills} pagePosition="bottomCenter"
-          pagination=${{ pageSize: 50 }} />
+        <${Space} direction="vertical" size=${15} style=${{ width: '100%' }}>
+          <${Space} size=${15}>
+            <${DatePicker.RangePicker} allowClear value=${range}
+              onChange=${(_, dates) => setRange(dates)}
+              showTime=${{ defaultValue: ['00:00:00', '23:59:59'], format: 'HH:mm:ss' }}
+              disabledDate=${(date) => dayjs(date).isAfter(dayjs())}
+              shortcutsPlacementLeft shortcuts=${SHORTCUTS}
+            />
+            <${Select} value=${region} onChange=${region => setRegion(region)} style=${{ width: 300 }}
+              allowClear showSearch placeholder="不限" options=${regions.map(r => r.value)} />
+          <//>
+          <${Table} loading=${loading === 'bills'} size="small" columns=${billColumns} data=${filteredBills} pagePosition="bottomCenter"
+            pagination=${{ pageSize: 50 }} />
+        <//>
       <//>
     <//>
   <//>
@@ -240,6 +331,7 @@ function useLocalStorage (key, initialValue) {
   const [ storedValue, setStoredValue ] = useState(() => {
     try {
       const item = window.localStorage.getItem(key)
+      if (item === 'undefined') return initialValue
       return item ? JSON.parse(item) : initialValue
     } catch (error) {
       console.log(error)
