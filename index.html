@@ -36,7 +36,8 @@ a {
 import htm from 'https://cdn.jsdelivr.net/npm/htm/+esm'
 import { createElement, useEffect, useMemo, useState } from 'https://cdn.jsdelivr.net/npm/react@18.2.0/+esm'
 import { render } from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm'
-import { Card, Checkbox, DatePicker, Select, Space, Table, Tabs } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/+esm'
+import { Button, Card, Checkbox, DatePicker, Select, Space, Table, Tabs } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/+esm'
+import { IconEdit } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/icon/+esm'
 import Big from 'https://cdn.jsdelivr.net/npm/big.js/+esm'
 import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs/+esm'
 import isSameOrAfter from 'https://cdn.jsdelivr.net/npm/dayjs/plugin/isSameOrAfter.js/+esm'
@@ -88,6 +89,7 @@ function App() {
       bills = bills.filter(Boolean)
       const sum = {}
       const count = {}
+      const total = {}
       let totalSum = new Big(0)
       let totalCount = 0
       const billRoutes = {}
@@ -112,6 +114,8 @@ function App() {
         if (!billRoutes[routeKey]) billRoutes[routeKey] = { bills: [], minTime: 0, maxTime: 0 }
         billRoutes[routeKey].bills.push(bills[i])
         bills[i].RouteKey = routeKey
+        total[s] = total[s] || []
+        total[s].push(routeKey)
       })
       for (const key in billRoutes) {
         billRoutes[key].minTime = billRoutes[key].bills.reduce((min, b) => b.Time < min ? b.Time : min, billRoutes[key].bills[0].Time)
@@ -125,11 +129,19 @@ function App() {
         bills[i].RouteMinTime = minTime
       })
       setBills(bills)
-      const months = Object.keys(sum).map(month => ({
-        month,
-        count: count[month],
-        sum: sum[month].toString(),
-      }))
+      const months = Object.keys(sum).map(month => {
+        const y = parseInt(month.split('-')[0])
+        const m = parseInt(month.split('-')[1]) - 1
+        const firstDayOfMonth = dayjs(new Date(y, m, 1, 0, 0, 0))
+        const lastDayOfMonth = dayjs(new Date(y, m + 1, 0, 23, 59, 59))
+        return {
+          month,
+          range: [ firstDayOfMonth, lastDayOfMonth ],
+          count: count[month],
+          sum: sum[month].toString(),
+          total: total[month],
+        }
+      })
       setMonths(months)
       setSummary({
         count: totalCount,
@@ -143,13 +155,18 @@ function App() {
           const key = `${route.From}-${route.To}`
           const price = billRoutes[key].bills.map(b => b.Amount)[0]
           const perKM = route.DrivingDistance === 0 ? 0 : price / (route.DrivingDistance / 1000)
-          const speeds = billRoutes[key].bills.map(b => route.DrivingDistance / b.Time)
-          const maxSpeed = Math.max(...speeds)
-          const minSpeed = Math.min(...speeds)
+          const speeds = billRoutes[key].bills.filter(b => b.Time > 0).map(b => route.DrivingDistance / b.Time)
+          const maxSpeed = speeds.length ? Math.max(...speeds) : 0
+          const minSpeed = speeds.length ? Math.min(...speeds) : 0
           return { ...route, Value: key, Count: billRoutes[key].bills.length,
             Price: price, PerKM: perKM, MaxSpeed: maxSpeed, MinSpeed: minSpeed }
         })
         routes.sort((a, b) => b.Count - a.Count)
+        setMonths(months => {
+          const m = months.map(m => ({ ...m, totalDistance: m.total.reduce((a, c) => a + (routes.find(r => r.Value === c)?.DrivingDistance || 0), 0) }))
+          setSummary(summary => ({ ...summary, totalDistance: m.reduce((a, c) => a + c.totalDistance, 0), }))
+          return m
+        })
         setBills(bills => bills.map(bill => ({ ...bill,
           Speed: bill.Time === 0 ? 0 : (routes.find(r => r.Value === bill.RouteKey)?.DrivingDistance || 0) / bill.Time,
         })))
@@ -165,14 +182,10 @@ function App() {
     {
       title: '月份',
       dataIndex: 'month',
-      render: value => html`<a href="" onClick=${e => {
+      render: (value, { range }) => html`<a href="" onClick=${e => {
         e.preventDefault()
         setCurrentTab('bills')
-        const year = parseInt(value.split('-')[0])
-        const month = parseInt(value.split('-')[1]) - 1
-        const firstDayOfMonth = dayjs(new Date(year, month, 1, 0, 0, 0))
-        const lastDayOfMonth = dayjs(new Date(year, month + 1, 0, 23, 59, 59))
-        setRange([ firstDayOfMonth, lastDayOfMonth ])
+        setRange([ ...range ])
       }}>${value}</a>`,
     },
     {
@@ -181,15 +194,24 @@ function App() {
       sorter: (a, b) => a.count - b.count,
     },
     {
-      title: '合计',
+      title: '金额',
       dataIndex: 'sum',
       sorter: (a, b) => a.sum - b.sum,
+    },
+    {
+      title: '驾驶距离',
+      dataIndex: 'totalDistance',
+      sorter: (a, b) => a.totalDistance - b.totalDistance,
+      render: distance => distance > 0 ? `${(distance / 1000).toFixed(3)} km` : '-'
     },
   ], [])
 
   const routeColumns = useMemo(() => [
     {
-      title: '路线',
+      title: html`<${Space}>
+        <span>路线</span>
+        <a href="https://codepen.io/caiguanhao/full/ZEZvLpa" target="_blank"><${Button} size="mini" icon=${html`<${IconEdit} />`} /></a>
+      <//>`,
       dataIndex: 'Value',
       render: value => html`<a href="" onClick=${e => {
         e.preventDefault()
@@ -198,7 +220,7 @@ function App() {
       }}>${value}</a>`,
     },
     {
-      title: '数量',
+      title: '次数',
       dataIndex: 'Count',
       sorter: (a, b) => a.Count - b.Count,
       render: Count => Count,
@@ -211,13 +233,13 @@ function App() {
       render: DrivingDistance => DrivingDistance > 0 ? `${(DrivingDistance / 1000).toFixed(3)} km` : '-'
     },
     {
-      title: '价格',
+      title: '金额',
       dataIndex: 'Price',
       sorter: (a, b) => a.Price - b.Price,
       render: Price => Price,
     },
     {
-      title: '均价',
+      title: '每公里费用',
       dataIndex: 'PerKM',
       sorter: (a, b) => a.PerKM - b.PerKM,
       render: PerKM => PerKM > 0 ? PerKM.toFixed(4) : '-',
@@ -316,6 +338,7 @@ function App() {
                 <${Table.Summary.Cell}>合计<//>
                 <${Table.Summary.Cell}>${summary.count}<//>
                 <${Table.Summary.Cell}>${summary.sum}<//>
+                <${Table.Summary.Cell}>${summary.totalDistance > 0 ? `${(summary.totalDistance / 1000).toFixed(3)} km` : '-'}<//>
               <//>`
             )} />
           <${Table} size="small" columns=${routeColumns} data=${filteredRoutes} pagination=${false}
