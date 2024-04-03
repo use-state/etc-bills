@@ -1,0 +1,223 @@
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link href="https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/dist/css/arco.css" rel="stylesheet" crossorigin="anonymous" />
+<script type="text/javascript">
+  window._AMapSecurityConfig = {
+    securityJsCode: 'd360b45265a6b65016eca2fb8d59da48',
+  }
+</script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=c2d8624cfd8ff1058ab6e3ea23d9a779&plugin=AMap.Driving,AMap.PlaceSearch"></script>
+<title>e高速</title>
+<style>
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.arco-input.active {
+  outline: 2px solid rgb(var(--primary-6));
+  border-color: transparent;
+}
+.tablec {
+  width: 50%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+.save {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+}
+.mapc {
+  width: 50%;
+  height: 100%;
+  position: relative;
+}
+.map {
+  width: 100%;
+  height: 100%;
+}
+.search {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  background: #fff;
+  padding: 10px;
+  border-radius: 6px;
+}
+</style>
+</head>
+<body>
+<div id="root">Loading...</div>
+<script type="module">
+import htm from 'https://cdn.jsdelivr.net/npm/htm/+esm'
+import { createElement, useCallback, useEffect, useMemo, useRef, useState } from 'https://cdn.jsdelivr.net/npm/react@18.2.0/+esm'
+import { render } from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm'
+import { Button, Card, Input, InputNumber, Modal, Select, Space, Table } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/+esm'
+import { IconSave } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/icon/+esm'
+
+const html = htm.bind(createElement)
+
+function App() {
+  const [ routes, setRoutes ] = useState([])
+  const [ editing, setEditing ] = useState(null)
+  const [ query, setQuery ] = useState(null)
+  const [ size, setSize ] = useState(2)
+  const placeSearch = useRef(null)
+  const driving = useRef(null)
+
+  const updateRoute = useCallback((i, key, value) => setRoutes(routes => ([
+    ...routes.slice(0, i),
+    { ...routes[i], [ key ]: value },
+    ...routes.slice(i + 1),
+  ])), [])
+
+  useEffect(() => {
+    window.__yigaosuRoutes = routes => {
+      setRoutes(routes.filter(Boolean))
+    }
+    loadScript('https://use-state.github.io/etc-bills/routes.js')
+  }, [])
+
+  useEffect(() => {
+    const map = new AMap.Map('map', {
+      resizeEnable: true
+    })
+
+    const ps = new AMap.PlaceSearch({
+      pageSize: 2,
+      pageIndex: 1,
+      map: map,
+      autoFitView: true,
+    })
+    ps.on('markerClick', e => {
+      setEditing(editing => {
+        if (editing) {
+          const idx = editing[0]
+          const field = editing[1]
+          const loc = e.data.location
+          updateRoute(idx, field, `${loc.lat}, ${loc.lng}`)
+        }
+        return editing
+      })
+    })
+    placeSearch.current = ps
+
+    const d = new AMap.Driving({
+      map: map,
+    })
+    driving.current = d
+  }, [])
+
+  const routeColumns = useMemo(() => [
+    {
+      title: '起点',
+      dataIndex: 'From',
+    },
+    {
+      title: '起点',
+      dataIndex: 'FromCoords',
+      render: (value, { From }, i) => html`<${Input} value=${value}
+        className=${editing && editing[0] === i && editing[1] === 'FromCoords' ? 'active' : ''}
+        onChange=${v => updateRoute(i, 'FromCoords', v)}
+        onFocus=${() => {
+          if (placeSearch.current) {
+            const q = `${From.replace(/站$/, '收费站')}入口`
+            setQuery(q)
+            placeSearch.current.search(q)
+          }
+          setEditing([ i, 'FromCoords' ])
+        }} />`,
+    },
+    {
+      title: '终点',
+      dataIndex: 'To',
+    },
+    {
+      title: '起点',
+      dataIndex: 'ToCoords',
+      render: (value, { To }, i) => html`<${Input} value=${value}
+        className=${editing && editing[0] === i && editing[1] === 'ToCoords' ? 'active' : ''}
+        onChange=${v => updateRoute(i, 'ToCoords', v)}
+        onFocus=${() => {
+          if (placeSearch.current) {
+            const q = `${To.replace(/站$/, '收费站')}出口`
+            setQuery(q)
+            placeSearch.current.search(q)
+          }
+          setEditing([ i, 'ToCoords' ])
+        }} />`,
+    },
+    {
+      title: '驾驶距离',
+      dataIndex: 'DrivingDistance',
+      render: (value, { FromCoords, ToCoords }, idx) => html`<${InputNumber} value=${value} min="0" step="1"
+        onChange=${v => updateRoute(idx, 'DrivingDistance', v)}
+        onFocus=${() => {
+          if (FromCoords && ToCoords) {
+            const [ a, b ] = FromCoords.split(/\s*,\s*/, 2)
+            const [ c, d ] = ToCoords.split(/\s*,\s*/, 2)
+            driving.current.search(new AMap.LngLat(b, a), new AMap.LngLat(d, c), (status, result) => {
+              if (status === 'complete') {
+                console.info(result)
+                updateRoute(idx, 'DrivingDistance', result.routes[0].distance)
+              }
+            })
+          }
+        }} />`,
+    },
+  ] , [ editing ])
+
+  const showCode = useCallback(() => {
+    const result = []
+    result.push('__yigaosuRoutes([\n')
+    for (let i = 0; i < routes.length; i++) {
+      result.push(JSON.stringify(routes[i]) + ',\n')
+    }
+    result.push('null\n])')
+    const code = result.join('')
+    Modal.info({
+      content: html`<${Input.TextArea} readOnly value=${code} style=${{ height: 300 }} />`,
+    })
+  }, [ routes ])
+
+  return html`<div style=${{ display: 'flex', height: '100%', width: '100%' }}>
+  <div className="tablec">
+    <${Table} size="small" columns=${routeColumns} data=${routes} pagination=${false} />
+  </div>
+  <div className="mapc">
+    <${Space} className="search">
+      <${Input} value=${query} onChange=${v => setQuery(v)} style=${{ width: 200 }}
+        onPressEnter=${() => placeSearch.current.search(query)} />
+      <${Select} value=${size} onChange=${v => {
+        setSize(v)
+        placeSearch.current.setPageSize(v)
+        placeSearch.current.search(query)
+      }} options=${[2, 5].map(n => ({ label: `${n}条结果`, value: n }))} />
+    <//>
+    <div className="map" id="map"></div>
+    <${Button} className="save" type="primary" size="large" icon=${html`<${IconSave}
+      onClick=${showCode} />`} />
+  </div>
+</div>`
+}
+
+render(html`<${App} />`, document.getElementById('root'))
+
+function loadScript (src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = src
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+}
+</script>
+</body>
+</html>
