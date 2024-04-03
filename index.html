@@ -59,15 +59,15 @@ const SHORTCUTS = [
 function App() {
   const [ card, setCard ] = useState(null)
   const [ cards, setCards ] = useState([])
-  const [ regions, setRegions ] = useState([])
   const [ bills, setBills ] = useState([])
+  const [ billRoutes, setBillRoutes ] = useState({})
   const [ months, setMonths ] = useState([])
   const [ summary, setSummary ] = useState({})
-  const [ routes, setRoutes ] = useState({})
+  const [ routes, setRoutes ] = useState([])
   const [ loading, setLoading ] = useState(null)
   const [ currentTab, setCurrentTab ] = useLocalStorage('currentTab', 'summary')
   const [ range, setRange ] = useLocalStorage('currentRange', [])
-  const [ region, setRegion ] = useLocalStorage('currentRegion', undefined)
+  const [ route, setRoute ] = useLocalStorage('currentRoute', undefined)
   const [ hideOne, setHideOne ] = useLocalStorage('hideOne', true)
 
   useEffect(() => {
@@ -90,7 +90,7 @@ function App() {
       const count = {}
       let totalSum = new Big(0)
       let totalCount = 0
-      const routes = {}
+      const billRoutes = {}
       bills.forEach((bill, i) => {
         const date = new Date(bill.EndAt)
         const s = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -109,18 +109,18 @@ function App() {
         bills[i].From = fix(bills[i].From)
         bills[i].To = fix(bills[i].To)
         const routeKey = `${bills[i].From}-${bills[i].To}`
-        if (!routes[routeKey]) routes[routeKey] = { bills: [], minTime: 0, maxTime: 0 }
-        routes[routeKey].bills.push(bills[i])
+        if (!billRoutes[routeKey]) billRoutes[routeKey] = { bills: [], minTime: 0, maxTime: 0 }
+        billRoutes[routeKey].bills.push(bills[i])
         bills[i].RouteKey = routeKey
       })
-      for (const key in routes) {
-        routes[key].minTime = routes[key].bills.reduce((min, b) => b.Time < min ? b.Time : min, routes[key].bills[0].Time)
-        routes[key].maxTime = routes[key].bills.reduce((max, b) => b.Time > max ? b.Time : max, routes[key].bills[0].Time)
-        routes[key].bills.sort((a, b) => a.Time - b.Time)
+      for (const key in billRoutes) {
+        billRoutes[key].minTime = billRoutes[key].bills.reduce((min, b) => b.Time < min ? b.Time : min, billRoutes[key].bills[0].Time)
+        billRoutes[key].maxTime = billRoutes[key].bills.reduce((max, b) => b.Time > max ? b.Time : max, billRoutes[key].bills[0].Time)
+        billRoutes[key].bills.sort((a, b) => a.Time - b.Time)
       }
-      setRoutes(routes)
+      setBillRoutes(billRoutes)
       bills.forEach((bill, i) => {
-        const minTime = routes[bill.RouteKey].minTime
+        const minTime = billRoutes[bill.RouteKey].minTime
         bills[i].TimeDiff = (minTime - bill.Time) / minTime
         bills[i].RouteMinTime = minTime
       })
@@ -136,14 +136,17 @@ function App() {
         sum: totalSum.toString(),
       })
 
-      setLoading('regions')
-      window.__yigaosuRegions = regions => {
+      setLoading('routes')
+      window.__yigaosuRoutes = routes => {
         setLoading(null)
-        regions = regions.filter(Boolean).map(region => ({ value: region, count: routes[region].bills.length }))
-        regions.sort((a, b) => b.count - a.count)
-        setRegions(regions)
+        routes = routes.filter(Boolean).map(route => {
+          const key = `${route.From}-${route.To}`
+          return { value: key, count: billRoutes[key].bills.length }
+        })
+        routes.sort((a, b) => b.count - a.count)
+        setRoutes(routes)
       }
-      loadScript('regions.js')
+      loadScript('routes.js')
     }
     setLoading('bills')
     loadScript(`${card}.js`)
@@ -175,14 +178,14 @@ function App() {
     },
   ], [])
 
-  const regionColumns = useMemo(() => [
+  const routeColumns = useMemo(() => [
     {
       title: '路线',
       dataIndex: 'value',
       render: value => html`<a href="" onClick=${e => {
         e.preventDefault()
         setCurrentTab('bills')
-        setRegion(value)
+        setRoute(value)
       }}>${value}</a>`,
     },
     {
@@ -251,12 +254,12 @@ function App() {
     .filter(b => range && range.length === 2 ? (
       dayjs(b.BeginAt).isSameOrAfter(range[0]) && dayjs(b.EndAt).isSameOrBefore(range[1])
     ): true)
-    .filter(b => region ? (
-      b.RouteKey === region
+    .filter(b => route ? (
+      b.RouteKey === route
     ): true)
-  ), [ bills, range, region ])
+  ), [ bills, range, route ])
 
-  const filteredRegions = useMemo(() => regions.filter(r => hideOne ? r.count > 1 : true), [ regions, hideOne ])
+  const filteredRoutes = useMemo(() => routes.filter(r => hideOne ? r.count > 1 : true), [ routes, hideOne ])
 
   return html`<${Card}>
   <${Space} direction="vertical" size=${15} style=${{ width: '100%' }}>
@@ -275,7 +278,7 @@ function App() {
                 <${Table.Summary.Cell}>${summary.sum}<//>
               <//>`
             )} />
-          <${Table} size="small" columns=${regionColumns} data=${filteredRegions} pagination=${false}
+          <${Table} size="small" columns=${routeColumns} data=${filteredRoutes} pagination=${false}
           footer=${() => html`<${Checkbox} checked=${hideOne} onChange=${setHideOne}>不显示数量为1的路线<//>`} />
         <//>
       <//>
@@ -288,8 +291,8 @@ function App() {
               disabledDate=${(date) => dayjs(date).isAfter(dayjs())}
               shortcutsPlacementLeft shortcuts=${SHORTCUTS}
             />
-            <${Select} value=${region} onChange=${region => setRegion(region)} style=${{ width: 300 }}
-              allowClear showSearch placeholder="不限" options=${regions.map(r => r.value)} />
+            <${Select} value=${route} onChange=${route => setRoute(route)} style=${{ width: 300 }}
+              allowClear showSearch placeholder="不限" options=${routes.map(r => r.value)} />
           <//>
           <${Table} loading=${loading === 'bills'} size="small" columns=${billColumns} data=${filteredBills} pagePosition="bottomCenter"
             pagination=${{ pageSize: 50 }} />
