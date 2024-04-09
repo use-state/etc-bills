@@ -16,7 +16,7 @@ __yigaosuRoutes([
 {"From":"广东佛平路站","To":"广东冲鹤站","FromCoords":"23.028721, 113.172498","ToCoords":"22.803658, 113.192787","DrivingDistance":25335},
 {"From":"广东佛平路站","To":"广东勒流站","FromCoords":"23.028721, 113.172498","ToCoords":"22.862208, 113.182668","DrivingDistance":18705},
 {"From":"广东佛平路站","To":"广东北滘站","FromCoords":"23.028721, 113.172498","ToCoords":"22.906177, 113.185648","DrivingDistance":15190},
-{"From":"广东佛平路站","To":"广东容桂站","FromCoords":"","ToCoords":"","DrivingDistance":0},
+{"From":"广东佛平路站","To":"广东容桂站","FromCoords":"23.028721, 113.172498","ToCoords":"22.743909, 113.313983","DrivingDistance":44455},
 {"From":"广东佛平路站","To":"广东广佛新干线站","FromCoords":"23.040883, 113.172563","ToCoords":"23.086912, 113.168126","DrivingDistance":5120},
 {"From":"广东佛平路站","To":"广东花卉大道站","FromCoords":"23.028721, 113.172498","ToCoords":"22.976422, 113.177","DrivingDistance":5850},
 {"From":"广东佛平路站","To":"广东西龙站","FromCoords":"23.028721, 113.172498","ToCoords":"22.998396, 113.172684","DrivingDistance":3358},
