@@ -99,6 +99,7 @@ __yigaosuRoutes([
 {"From":"广东金门站","To":"广东广海站","FromCoords":"22.220585, 113.109901","ToCoords":"21.974808, 112.786636","DrivingDistance":46973},
 {"From":"广东陈山站","To":"广东徐闻港站","FromCoords":"22.738799, 112.991602","ToCoords":"20.274103, 110.145474","DrivingDistance":478685},
 {"From":"广东陈山站","To":"广东谢边站","FromCoords":"22.738799, 112.991602","ToCoords":"23.066447, 113.106541","DrivingDistance":41139},
+{"From":"广东顺德站","To":"广东三龙湾站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东顺德站","To":"广东五沙站","FromCoords":"22.830761, 113.305992","ToCoords":"22.818175, 113.348808","DrivingDistance":12098},
 {"From":"广东顺德站","To":"广东亚运城站","FromCoords":"22.830761, 113.305992","ToCoords":"22.93453, 113.424162","DrivingDistance":26802},
 {"From":"广东顺德站","To":"广东佛平路站","FromCoords":"22.830761, 113.305992","ToCoords":"23.026337, 113.173216","DrivingDistance":31085},
