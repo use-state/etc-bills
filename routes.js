@@ -81,6 +81,7 @@ __yigaosuRoutes([
 {"From":"广东潭洲会展站","To":"广东冲鹤站","FromCoords":"22.926152, 113.173715","ToCoords":"22.803658, 113.192787","DrivingDistance":13822},
 {"From":"广东潭洲会展站","To":"广东勒流站","FromCoords":"22.926152, 113.173715","ToCoords":"22.862208, 113.182668","DrivingDistance":7192},
 {"From":"广东潭洲会展站","To":"广东北滘站","FromCoords":"22.926152, 113.173715","ToCoords":"22.906177, 113.185648","DrivingDistance":3677},
+{"From":"广东潭洲会展站","To":"广东西华站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东潭洲会展站","To":"广东高赞站","FromCoords":"22.926152, 113.173715","ToCoords":"22.763522, 113.205753","DrivingDistance":18472},
 {"From":"广东环镇西站","To":"广东冲鹤站","FromCoords":"22.927169, 113.081202","ToCoords":"22.803658, 113.192787","DrivingDistance":21943},
 {"From":"广东碧江站","To":"广东三龙湾站","FromCoords":"22.942074, 113.25369","ToCoords":"23.004936, 113.223181","DrivingDistance":9250},
