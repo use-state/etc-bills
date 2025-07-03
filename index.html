@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link href="https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/dist/css/arco.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://esm.sh/@arco-design/web-react@2.61.1/dist/css/arco.css" rel="stylesheet" crossorigin="anonymous" />
 <title>e高速</title>
 <style>
 html, body {
@@ -33,15 +33,15 @@ a {
 <body>
 <div id="root">Loading...</div>
 <script type="module">
-import htm from 'https://cdn.jsdelivr.net/npm/htm/+esm'
-import { createElement, useEffect, useMemo, useState } from 'https://cdn.jsdelivr.net/npm/react@18.2.0/+esm'
-import { render } from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm'
-import { Button, Card, Checkbox, DatePicker, Select, Space, Table, Tabs } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/+esm'
-import { IconEdit } from 'https://cdn.jsdelivr.net/npm/@arco-design/web-react@2.61.1/icon/+esm'
-import Big from 'https://cdn.jsdelivr.net/npm/big.js/+esm'
-import dayjs from 'https://cdn.jsdelivr.net/npm/dayjs/+esm'
-import isSameOrAfter from 'https://cdn.jsdelivr.net/npm/dayjs/plugin/isSameOrAfter.js/+esm'
-import isSameOrBefore from 'https://cdn.jsdelivr.net/npm/dayjs/plugin/isSameOrBefore.js/+esm'
+import htm from 'https://esm.sh/htm@3.1.1'
+import { createElement, useEffect, useMemo, useState } from 'https://esm.sh/react@18.2.0'
+import { render } from 'https://esm.sh/react-dom@18.2.0'
+import { Button, Card, Checkbox, DatePicker, Select, Space, Table, Tabs } from 'https://esm.sh/@arco-design/web-react@2.61.1?deps=react@18.2.0,react-dom@18.2.0'
+import { IconEdit } from 'https://esm.sh/@arco-design/web-react@2.61.1/icon?deps=react@18.2.0,react-dom@18.2.0'
+import Big from 'https://esm.sh/big.js@6.2.0'
+import dayjs from 'https://esm.sh/dayjs@1.11.13'
+import isSameOrAfter from 'https://esm.sh/dayjs@1.11.13/plugin/isSameOrAfter.js'
+import isSameOrBefore from 'https://esm.sh/dayjs@1.11.13/plugin/isSameOrBefore.js'
 
 dayjs.extend(isSameOrAfter)
 dayjs.extend(isSameOrBefore)
