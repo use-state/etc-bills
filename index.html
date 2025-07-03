@@ -118,14 +118,14 @@ function App() {
         total[s].push(routeKey)
       })
       for (const key in billRoutes) {
-        billRoutes[key].minTime = billRoutes[key].bills.reduce((min, b) => b.Time < min ? b.Time : min, billRoutes[key].bills[0].Time)
-        billRoutes[key].maxTime = billRoutes[key].bills.reduce((max, b) => b.Time > max ? b.Time : max, billRoutes[key].bills[0].Time)
+        const filteredBills = billRoutes[key].bills.filter(b => b.Time > 0)
+        billRoutes[key].minTime = filteredBills.length ? filteredBills.reduce((min, b) => b.Time < min ? b.Time : min, filteredBills[0].Time) : 0
+        billRoutes[key].maxTime = filteredBills.length ? filteredBills.reduce((max, b) => b.Time > max ? b.Time : max, filteredBills[0].Time) : 0
         billRoutes[key].bills.sort((a, b) => a.Time - b.Time)
       }
       setBillRoutes(billRoutes)
       bills.forEach((bill, i) => {
         const minTime = billRoutes[bill.RouteKey].minTime
-        bills[i].TimeDiff = (minTime - bill.Time) / minTime
         bills[i].RouteMinTime = minTime
       })
       setBills(bills)
@@ -153,13 +153,15 @@ function App() {
         setLoading(null)
         routes = routes.filter(Boolean).map(route => {
           const key = `${route.From}-${route.To}`
-          const price = billRoutes[key].bills.map(b => b.Amount)[0]
+          const filteredBills = billRoutes[key].bills.filter(b => b.Time > 0)
+          const price = filteredBills.map(b => b.Amount)[0]
           const perKM = route.DrivingDistance === 0 ? 0 : price / (route.DrivingDistance / 1000)
-          const speeds = billRoutes[key].bills.filter(b => b.Time > 0).map(b => route.DrivingDistance / b.Time)
+          const speeds = filteredBills.map(b => b.Time > 0 ? (route.DrivingDistance / b.Time) : 0)
           const maxSpeed = speeds.length ? Math.max(...speeds) : 0
           const minSpeed = speeds.length ? Math.min(...speeds) : 0
+          const avgSpeed = speeds.length ? speeds.reduce((a, b) => a + b, 0) / speeds.length : 0
           return { ...route, Value: key, Count: billRoutes[key].bills.length,
-            Price: price, PerKM: perKM, MaxSpeed: maxSpeed, MinSpeed: minSpeed }
+            Price: price, PerKM: perKM, MaxSpeed: maxSpeed, MinSpeed: minSpeed, AvgSpeed: avgSpeed }
         })
         routes.sort((a, b) => b.Count - a.Count)
         setMonths(months => {
@@ -167,9 +169,17 @@ function App() {
           setSummary(summary => ({ ...summary, totalDistance: m.reduce((a, c) => a + c.totalDistance, 0), }))
           return m
         })
-        setBills(bills => bills.map(bill => ({ ...bill,
-          Speed: bill.Time === 0 ? 0 : (routes.find(r => r.Value === bill.RouteKey)?.DrivingDistance || 0) / bill.Time,
-        })))
+        setBills(bills => bills.map(bill => {
+          const route = routes.find(r => r.Value === bill.RouteKey)
+          const speed = route && bill.Time > 0 ? (route.DrivingDistance / bill.Time) : NaN
+          const speedDiff = route ? (speed - route.AvgSpeed) : NaN
+          return { ...bill,
+            Speed: speed,
+            SpeedDiff: speedDiff,
+            SpeedDiffPercent: isNaN(speedDiff) || route.AvgSpeed === 0 ? NaN :
+              (speedDiff / route.AvgSpeed * 100),
+          }
+        }))
         setRoutes(routes)
       }
       loadScript('routes.js')
@@ -256,6 +266,12 @@ function App() {
       sorter: (a, b) => a.MinSpeed - b.MinSpeed,
       render: MinSpeed => MinSpeed > 0 ? `${(MinSpeed * 3.6).toFixed(2)} km/h` : '-',
     },
+    {
+      title: '平均速度',
+      dataIndex: 'AvgSpeed',
+      sorter: (a, b) => a.AvgSpeed - b.AvgSpeed,
+      render: AvgSpeed => AvgSpeed > 0 ? `${(AvgSpeed * 3.6).toFixed(2)} km/h` : '-',
+    },
   ] , [])
 
   const billColumns = useMemo(() => [
@@ -290,14 +306,26 @@ function App() {
     {
       title: '速度',
       dataIndex: 'Speed',
-      sorter: (a, b) => a.Speed - b.Speed,
-      render: Speed => Speed > 0 ? `${(Speed * 3.6).toFixed(2)} km/h` : '-',
+      sorter: (a, b) => {
+        if (isNaN(a.Speed) && isNaN(b.Speed)) return 0
+        if (isNaN(a.Speed)) return -1
+        if (isNaN(b.Speed)) return 1
+        return a.Speed - b.Speed
+      },
+      render: Speed => isNaN(Speed) ? '-' : `${(Speed * 3.6).toFixed(2)} km/h`,
     },
     {
-      title: '较最快',
-      dataIndex: 'TimeDiff',
-      sorter: (a, b) => a.TimeDiff - b.TimeDiff,
-      render: TimeDiff => isNaN(TimeDiff) ? '-' : `${(TimeDiff * 100).toFixed(2)}%`,
+      title: '较平均速度',
+      dataIndex: 'SpeedDiff',
+      sorter: (a, b) => {
+        if (isNaN(a.SpeedDiff) && isNaN(b.SpeedDiff)) return 0
+        if (isNaN(a.SpeedDiff)) return -1
+        if (isNaN(b.SpeedDiff)) return 1
+        return a.SpeedDiff - b.SpeedDiff
+      },
+      render: (SpeedDiff, { SpeedDiffPercent }) => isNaN(SpeedDiff) ? '-' :
+        SpeedDiff >= 0 ? html`<span style=${{ color: 'green' }}>+${SpeedDiffPercent.toFixed(2)}% (+${(SpeedDiff * 3.6).toFixed(2)} km/h)</span>` :
+        html`<span style=${{ color: 'red' }}>${SpeedDiffPercent.toFixed(2)}% (${(SpeedDiff * 3.6).toFixed(2)} km/h)</span>`,
     },
     {
       title: '金额',
