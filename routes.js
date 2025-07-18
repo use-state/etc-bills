@@ -44,6 +44,7 @@ __yigaosuRoutes([
 {"From":"广东季华东站","To":"广东北滘站","FromCoords":"23.014412, 113.170232","ToCoords":"22.906177, 113.185648","DrivingDistance":13867},
 {"From":"广东季华东站","To":"广东花卉大道站","FromCoords":"23.014412, 113.170232","ToCoords":"22.976422, 113.177","DrivingDistance":4527},
 {"From":"广东季华东站","To":"广东西龙站","FromCoords":"23.014412, 113.170232","ToCoords":"22.998396, 113.172684","DrivingDistance":2035},
+{"From":"广东季华东站","To":"广东顺德站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东季华东站","To":"广东高赞站","FromCoords":"23.014412, 113.170232","ToCoords":"22.763522, 113.205753","DrivingDistance":28662},
 {"From":"广东容桂站","To":"广东南头站西线二期","FromCoords":"22.743972, 113.314468","ToCoords":"22.720001, 113.307748","DrivingDistance":3761},
 {"From":"广东容桂站","To":"广东南屏站","FromCoords":"22.743972, 113.314468","ToCoords":"22.214563, 113.464421","DrivingDistance":70561},
