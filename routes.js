@@ -124,6 +124,7 @@ __yigaosuRoutes([
 {"From":"广东高赞站","To":"广东季华东站","FromCoords":"22.758914, 113.209366","ToCoords":"23.014602, 113.170132","DrivingDistance":29871},
 {"From":"广东高赞站","To":"广东小榄北站","FromCoords":"22.758914, 113.209366","ToCoords":"22.686534, 113.218136","DrivingDistance":11983},
 {"From":"广东高赞站","To":"广东广佛新干线站","FromCoords":"22.758914, 113.209366","ToCoords":"23.086912, 113.168126","DrivingDistance":37073},
+{"From":"广东高赞站","To":"广东广州南站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东高赞站","To":"广东海五路站","FromCoords":"22.758914, 113.209366","ToCoords":"23.048931, 113.172431","DrivingDistance":32851},
 {"From":"广东高赞站","To":"广东海洲站","FromCoords":"22.758914, 113.209366","ToCoords":"22.653106, 113.18758","DrivingDistance":13110},
 {"From":"广东高赞站","To":"广东潭洲会展站","FromCoords":"22.758914, 113.209366","ToCoords":"22.930994, 113.173327","DrivingDistance":19650},
