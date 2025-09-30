@@ -67,6 +67,7 @@ __yigaosuRoutes([
 {"From":"广东横江站","To":"广东海五路站","FromCoords":"23.114942, 113.166778","ToCoords":"23.05469, 113.171527","DrivingDistance":6705},
 {"From":"广东水边站","To":"广东新市站","FromCoords":"24.09176, 113.125366","ToCoords":"23.183439, 113.260059","DrivingDistance":119975},
 {"From":"广东永汉站","To":"广东番禺大桥站","FromCoords":"23.560289, 113.997113","ToCoords":"23.022788, 113.335644","DrivingDistance":102409},
+{"From":"广东沙湾站","To":"广东大石站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东浔峰洲站","To":"广东江口站","FromCoords":"23.14596, 113.198342","ToCoords":"23.711524, 113.217941","DrivingDistance":75009},
 {"From":"广东海五路站","To":"广东佛平路站","FromCoords":"23.049616, 113.171649","ToCoords":"23.04129, 113.171712","DrivingDistance":923},
 {"From":"广东海五路站","To":"广东勒流站","FromCoords":"23.049616, 113.171649","ToCoords":"22.862208, 113.182668","DrivingDistance":21021},
