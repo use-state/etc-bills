@@ -37,6 +37,7 @@ __yigaosuRoutes([
 {"From":"广东南头站西线二期","To":"广东界涌站","FromCoords":"22.719616, 113.307651","ToCoords":"22.297228, 113.488818","DrivingDistance":64311},
 {"From":"广东南屏站","To":"广东容桂站","FromCoords":"22.216438, 113.464736","ToCoords":"22.743909, 113.313983","DrivingDistance":70041},
 {"From":"广东厚街站","To":"广东乐从站","FromCoords":"22.927406, 113.686684","ToCoords":"22.927746, 113.097677","DrivingDistance":73927},
+{"From":"广东双东站","To":"广东高赞站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东台城站","To":"广东三江站","FromCoords":"22.248582, 112.831391","ToCoords":"22.439137, 113.09123","DrivingDistance":44331},
 {"From":"广东大学城站","To":"广东细沥站","FromCoords":"23.043753, 113.376458","ToCoords":"22.83785, 113.439735","DrivingDistance":25001},
 {"From":"广东大沥站","To":"广东海陵岛站","FromCoords":"23.109228, 113.130053","ToCoords":"21.640857, 111.89132","DrivingDistance":243980},
