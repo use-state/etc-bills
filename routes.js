@@ -132,6 +132,7 @@ __yigaosuRoutes([
 {"From":"广东高赞站","To":"广东睦洲站","FromCoords":"22.758914, 113.209366","ToCoords":"22.464655, 113.170064","DrivingDistance":39994},
 {"From":"广东高赞站","To":"广东裕源站","FromCoords":"22.758914, 113.209366","ToCoords":"22.818727, 113.192231","DrivingDistance":6967},
 {"From":"广东高赞站","To":"广东西龙站","FromCoords":"22.758914, 113.209366","ToCoords":"22.983551, 113.177768","DrivingDistance":25566},
+{"From":"广西柳州东站","To":"广西大隆站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广西阳朔白沙","To":"广西高岩站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 null
 ])
