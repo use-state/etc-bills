@@ -112,6 +112,7 @@ __yigaosuRoutes([
 {"From":"广东顺德站","To":"广东亚运城站","FromCoords":"22.830761, 113.305992","ToCoords":"22.93453, 113.424162","DrivingDistance":26802},
 {"From":"广东顺德站","To":"广东佛平路站","FromCoords":"22.830761, 113.305992","ToCoords":"23.026337, 113.173216","DrivingDistance":31085},
 {"From":"广东顺德站","To":"广东南丫站","FromCoords":"22.830761, 113.305992","ToCoords":"23.051734, 113.226889","DrivingDistance":27385},
+{"From":"广东顺德站","To":"广东大石站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东顺德站","To":"广东季华东站","FromCoords":"22.830761, 113.305992","ToCoords":"23.014602, 113.170132","DrivingDistance":30603},
 {"From":"广东顺德站","To":"广东广州南站","FromCoords":"22.830761, 113.305992","ToCoords":"22.991836, 113.28468","DrivingDistance":20700},
 {"From":"广东顺德站","To":"广东海五路站","FromCoords":"22.830761, 113.305992","ToCoords":"23.048931, 113.172431","DrivingDistance":33583},
