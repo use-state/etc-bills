@@ -44,6 +44,7 @@ __yigaosuRoutes([
 {"From":"广东大沥站","To":"广东海陵岛站","FromCoords":"23.109228, 113.130053","ToCoords":"21.640857, 111.89132","DrivingDistance":243980},
 {"From":"广东季华东站","To":"广东勒流站","FromCoords":"23.014412, 113.170232","ToCoords":"22.862208, 113.182668","DrivingDistance":17382},
 {"From":"广东季华东站","To":"广东北滘站","FromCoords":"23.014412, 113.170232","ToCoords":"22.906177, 113.185648","DrivingDistance":13867},
+{"From":"广东季华东站","To":"广东潭洲会展北侧站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东季华东站","To":"广东花卉大道站","FromCoords":"23.014412, 113.170232","ToCoords":"22.976422, 113.177","DrivingDistance":4527},
 {"From":"广东季华东站","To":"广东西龙站","FromCoords":"23.014412, 113.170232","ToCoords":"22.998396, 113.172684","DrivingDistance":2035},
 {"From":"广东季华东站","To":"广东顺德站","FromCoords":"23.014412, 113.170232","ToCoords":"22.830752, 113.305618","DrivingDistance":30649},
