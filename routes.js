@@ -1,4 +1,5 @@
 __yigaosuRoutes([
+{"From":"","To":"","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东三水站","To":"广东高赞站","FromCoords":"23.171484, 112.90296","ToCoords":"22.763522, 113.205753","DrivingDistance":70941},
 {"From":"广东三龙湾站","To":"广东容桂站","FromCoords":"23.00497, 113.223008","ToCoords":"22.743909, 113.313983","DrivingDistance":34508},
 {"From":"广东三龙湾站","To":"广东碧江站","FromCoords":"23.00497, 113.223008","ToCoords":"22.942295, 113.253953","DrivingDistance":8423},
