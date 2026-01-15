@@ -87,6 +87,7 @@ __yigaosuRoutes([
 {"From":"广东海鸥岛站","To":"广东细沥站","FromCoords":"22.886047, 113.546887","ToCoords":"22.83785, 113.439735","DrivingDistance":17048},
 {"From":"广东清远站","To":"广东清远西站","FromCoords":"23.647947, 113.029968","ToCoords":"23.661045, 113.023065","DrivingDistance":1693},
 {"From":"广东清远西站","To":"广东吉利大道站","FromCoords":"23.66099, 113.022793","ToCoords":"22.96305, 113.024267","DrivingDistance":96836},
+{"From":"广东潭洲会展北侧站","To":"广东佛平路站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东潭洲会展北侧站","To":"广东西龙站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东潭洲会展站","To":"广东冲鹤站","FromCoords":"22.926152, 113.173715","ToCoords":"22.803658, 113.192787","DrivingDistance":13822},
 {"From":"广东潭洲会展站","To":"广东勒流站","FromCoords":"22.926152, 113.173715","ToCoords":"22.862208, 113.182668","DrivingDistance":7192},
