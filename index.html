@@ -151,7 +151,7 @@ function App() {
       setLoading('routes')
       window.__yigaosuRoutes = routes => {
         setLoading(null)
-        routes = routes.filter(Boolean).map(route => {
+        routes = routes.filter(Boolean).filter(route => billRoutes[`${route.From}-${route.To}`]).map(route => {
           const key = `${route.From}-${route.To}`
           const filteredBills = billRoutes[key].bills.filter(b => b.Time > 0)
           const price = filteredBills.map(b => b.Amount)[0]
