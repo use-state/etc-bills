@@ -98,6 +98,7 @@ __yigaosuRoutes([
 {"From":"广东碧江站","To":"广东三龙湾站","FromCoords":"22.942074, 113.25369","ToCoords":"23.004936, 113.223181","DrivingDistance":9250},
 {"From":"广东碧江站","To":"广东南丫匝道站","FromCoords":"22.942074, 113.25369","ToCoords":"23.051734, 113.226889","DrivingDistance":14031},
 {"From":"广东碧江站","To":"广东顺德站","FromCoords":"22.942074, 113.25369","ToCoords":"22.830734, 113.305634","DrivingDistance":13989},
+{"From":"广东福田站","To":"广东亭角站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东细沥站","To":"广东大学城站","FromCoords":"22.837397, 113.439768","ToCoords":"23.044379, 113.377062","DrivingDistance":26097},
 {"From":"广东西华站","To":"广东潭洲会展站","FromCoords":"22.836625, 113.191915","ToCoords":"22.930994, 113.173327","DrivingDistance":10716},
 {"From":"广东西樵站西二环南","To":"广东龙江站南二环","FromCoords":"22.931355, 112.940811","ToCoords":"22.836889, 113.084318","DrivingDistance":23050},
