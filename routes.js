@@ -43,6 +43,7 @@ __yigaosuRoutes([
 {"From":"广东台城站","To":"广东三江站","FromCoords":"22.248582, 112.831391","ToCoords":"22.439137, 113.09123","DrivingDistance":44331},
 {"From":"广东大学城站","To":"广东细沥站","FromCoords":"23.043753, 113.376458","ToCoords":"22.83785, 113.439735","DrivingDistance":25001},
 {"From":"广东大沥站","To":"广东海陵岛站","FromCoords":"23.109228, 113.130053","ToCoords":"21.640857, 111.89132","DrivingDistance":243980},
+{"From":"广东天亭站","To":"广东水步站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东季华东站","To":"广东勒流站","FromCoords":"23.014412, 113.170232","ToCoords":"22.862208, 113.182668","DrivingDistance":17382},
 {"From":"广东季华东站","To":"广东北滘站","FromCoords":"23.014412, 113.170232","ToCoords":"22.906177, 113.185648","DrivingDistance":13867},
 {"From":"广东季华东站","To":"广东潭洲会展北侧站","FromCoords":"23.014412, 113.170232","ToCoords":"22.947814, 113.170702","DrivingDistance":7776},
