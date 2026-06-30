@@ -32,6 +32,7 @@ __yigaosuRoutes([
 {"From":"广东勒流站","To":"广东广佛新干线站","FromCoords":"22.859645, 113.185152","ToCoords":"23.086912, 113.168126","DrivingDistance":25510},
 {"From":"广东勒流站","To":"广东海五路站","FromCoords":"22.859645, 113.185152","ToCoords":"23.048931, 113.172431","DrivingDistance":21288},
 {"From":"广东勒流站","To":"广东潭洲会展站","FromCoords":"22.859645, 113.185152","ToCoords":"22.930994, 113.173327","DrivingDistance":8087},
+{"From":"广东勒流站","To":"广东西龙站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东华快土华站","To":"广东永汉站","FromCoords":"23.068285, 113.34514","ToCoords":"23.560405, 113.997355","DrivingDistance":97442},
 {"From":"广东华快黄埔站","To":"广东白花站","FromCoords":"23.127741, 113.351962","ToCoords":"22.940843, 114.656559","DrivingDistance":167526},
 {"From":"广东华阳路站","To":"广东勒流站","FromCoords":"22.904546, 113.152059","ToCoords":"22.862208, 113.182668","DrivingDistance":7245},
