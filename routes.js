@@ -4,6 +4,7 @@ __yigaosuRoutes([
 {"From":"广东三龙湾站","To":"广东容桂站","FromCoords":"23.00497, 113.223008","ToCoords":"22.743909, 113.313983","DrivingDistance":34508},
 {"From":"广东三龙湾站","To":"广东碧江站","FromCoords":"23.00497, 113.223008","ToCoords":"22.942295, 113.253953","DrivingDistance":8423},
 {"From":"广东三龙湾站","To":"广东顺德站","FromCoords":"23.00497, 113.223008","ToCoords":"22.830734, 113.305634","DrivingDistance":22027},
+{"From":"广东东凤站","To":"广东徐闻港站","FromCoords":"","ToCoords":"","DrivingDistance":0},
 {"From":"广东东升站","To":"广东中山西站","FromCoords":"22.602826, 113.310143","ToCoords":"22.560179, 113.320837","DrivingDistance":7495},
 {"From":"广东东升站","To":"广东港口站","FromCoords":"22.602826, 113.310143","ToCoords":"22.588857, 113.395634","DrivingDistance":9583},
 {"From":"广东东沙站","To":"广东顺德站","FromCoords":"23.056442, 113.255247","ToCoords":"22.830734, 113.305634","DrivingDistance":27905},
